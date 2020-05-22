@@ -41,13 +41,19 @@ const tv = new SamsungTv(deviceConfig)
 //  .then(() => tv.confirmPin(pin))
 //  .then(() => tv.connect())
 //  .then(() => tv.sendKey('KEY_MUTE'))
+//tv.init()
+//       .then(() => tv.confirmPin(pin))
+//       .then(() => tv.connect())
 
 app.listen(port,()=> {
-console.log('listen port 8000');
+     tv.init()
+        .then(()=> tv.confirmPin(pin))
+	.then(() => tv.connect())
+     console.log('listen port 8000');
 })
 
 
-app.get('/mute', (req,res) => {
+app.get('/mutepin', (req,res) => {
 	tv.init()
   		.then(() => tv.confirmPin(pin))
   		.then(() => tv.connect())
@@ -55,11 +61,32 @@ app.get('/mute', (req,res) => {
     res.send('TV Muted')
 })
 
-app.get('/off', (req,res) => {
-        tv.init()
-                .then(() => tv.confirmPin(pin))
-                .then(() => tv.connect())
-                .then(() => tv.sendKey('KEY_POWEROFF'))
-    res.send('TV Muted')
+app.get('/mute', (req,res) => {
+    try{
+       tv.sendKey('KEY_MUTE')
+       res.send('TV Muted')
+   }
+   catch(err){
+      tv.init()
+        .then(() => tv.confirmPin(pin))
+        .then(() => tv.connect())
+        .then(() => tv.sendKey('KEY_MUTE'))
+      res.send('Pin entered an TV muted')
+   }
 })
 
+
+
+app.get('/off', (req,res) => {
+    try{
+       tv.sendKey('KEY_POWEROFF')
+       res.send('TV Muted')
+   }
+   catch(err){
+       tv.init()
+         .then(() => tv.confirmPin())
+         .then(() => tv.conect())
+         .then(() => tv.sendKey('KEY_POWEROFF'))
+         res.sen('Pin entered and TV Switched off')
+  }
+})
